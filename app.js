@@ -1,3 +1,4 @@
+
 // =====================
 // MAP SETUP
 // =====================
@@ -61,7 +62,7 @@ async function loadSheet() {
 
 
 // =====================
-// CSV PARSER (safer)
+// CSV PARSER
 // =====================
 
 function parseCSV(csv) {
@@ -132,15 +133,7 @@ async function buildMap() {
 
 
 // =====================
-// START
+// START APP
 // =====================
 
-async function buildMap() {
-  const data = await loadSheet();
-
-  console.log(data); // ✅ ONLY HERE
-
-  for (let m of data) {
-    ...
-  }
-}
+buildMap();
