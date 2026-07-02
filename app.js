@@ -9,10 +9,9 @@ const map = L.map('map').setView([20, 0], 2);
 L.tileLayer(
   'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
   {
-    attribution: '&copy; OpenStreetMap & CartoDB'
+    attribution: '© OpenStreetMap & CartoDB'
   }
 ).addTo(map);
-
 
 // =====================
 // GEOCODE
@@ -32,7 +31,6 @@ async function geocode(location) {
   };
 }
 
-
 // =====================
 // HELPERS
 // =====================
@@ -47,130 +45,95 @@ function getTitle(sex, name) {
     : `Elder ${name}`;
 }
 
-
 // =====================
-// GOOGLE SHEET
+// GOOGLE SHEET (JSON VERSION)
 // =====================
-
-const SHEET_URL =
-  "https://docs.google.com/spreadsheets/d/15BJwH_54gL9fWGCtg0FOwF_qYy4mAm7KWN1LVnSBl5w/gviz/tq?tqx=out:csv";
 
 async function loadSheet() {
-
   const url =
     "https://docs.google.com/spreadsheets/d/15BJwH_54gL9fWGCtg0FOwF_qYy4mAm7KWN1LVnSBl5w/gviz/tq?tqx=out:json";
 
   const res = await fetch(url);
   const text = await res.text();
 
-  // clean Google wrapper
-  const json = JSON.parse(
-    text.substring(47).slice(0, -2)
-  );
+  const json = JSON.parse(text.substring(47).slice(0, -2));
 
   const cols = json.table.cols.map(c => c.label);
 
   return json.table.rows.map(row => {
     let obj = {};
+
     row.c.forEach((cell, i) => {
       obj[cols[i]] = cell ? cell.v : "";
     });
-    return obj;
-  });
-}
-
-// =====================
-// CSV PARSER
-// =====================
-
-function parseCSV(csv) {
-  const lines = csv.trim().split("\n");
-
-  const headers = lines[0]
-    .split(",")
-    .map(h => h.replace(/"/g, "").trim());
-
-  return lines.slice(1).map(line => {
-
-    const values = line
-      .split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
-      .map(v => v.replace(/"/g, "").trim());
-
-    let obj = {};
-
-    headers.forEach((h, i) => {
-      obj[h] = values[i];
-    });
 
     return obj;
   });
 }
-
 
 // =====================
 // BUILD MAP
 // =====================
 
 async function buildMap() {
-
   const data = await loadSheet();
 
   console.log("RAW DATA LENGTH:", data.length);
   console.log("FIRST ROW:", data[0]);
 
- for (let m of data) {
+  for (let m of data) {
 
-  // 🔥 ADD THIS FIRST (inspect the row)
-  console.log("ROW OBJECT:", m);
-  console.log("ROW KEYS:", Object.keys(m));
+    console.log("ROW:", m);
 
-  // 🔥 ADD THIS SECOND (check actual values)
-  console.log("CITY:", m["Mission City"]);
-  console.log("COUNTRY:", m["Mission Country"]);
+    const city = m["Mission City"];
+    const country = m["Mission Country"];
 
-for (let m of data) {
+    console.log("CITY:", city);
+    console.log("COUNTRY:", country);
 
-  // 🔥 ADD THIS FIRST (inspect the row)
-  console.log("ROW OBJECT:", m);
-  console.log("ROW KEYS:", Object.keys(m));
+    if (!city || !country) {
+      console.log("SKIPPED ROW (missing city/country)");
+      continue;
+    }
 
-  // 🔥 ADD THIS SECOND (check actual values)
-  console.log("CITY:", m["Mission City"]);
-  console.log("COUNTRY:", m["Mission Country"]);
+    const location = `${city}, ${country}`;
+    console.log("LOCATION:", location);
 
-  if (!m["Mission City"] || !m["Mission Country"]) {
-    console.log("SKIPPED ROW (missing city/country)");
-    continue;
+    const coords = await geocode(location);
+    console.log("COORDS:", coords);
+
+    if (!coords) {
+      console.log("GEOCODE FAILED:", location);
+      continue;
+    }
+
+    const sex = m["Biological Sex"];
+    const name = m["Missionary Name (First Last) (e.g., Dawn Hollingsworth)"];
+
+    const color = getColor(sex);
+    const title = getTitle(sex, name);
+
+    L.circleMarker([coords.lat, coords.lng], {
+      radius: 6,
+      color,
+      fillColor: color,
+      fillOpacity: 0.85,
+      weight: 2
+    })
+    .addTo(map)
+    .bindPopup(`
+      <b>${title}</b><br><br>
+      ${m["Official Mission name (Ex: Maryland Baltimore)"] || ""}<br>
+      ${location}<br><br>
+      ${m["Start Date (MM/YYYY)"] || ""} – ${m["End Date (MM/YYYY)"] || ""}
+    `);
+
+    await new Promise(r => setTimeout(r, 300));
   }
-
-  const location = `${m["Mission City"]}, ${m["Mission Country"]}`;
-
-  console.log("LOCATION STRING:", location);
-
-  const coords = await geocode(location);
-
-  console.log("COORDS:", coords);
-
-  if (!coords) {
-    console.log("GEOCODE FAILED:", location);
-    continue;
-  }
-
-  L.circleMarker([coords.lat, coords.lng], {
-    radius: 6,
-    color: "red"
-  }).addTo(map);
 }
-
-  L.circleMarker([coords.lat, coords.lng], {
-    radius: 6,
-    color: "red"
-  }).addTo(map);
-}
-
 
 // =====================
-// START APP
+// START
 // =====================
 
 buildMap();
