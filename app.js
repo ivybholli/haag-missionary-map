@@ -1,9 +1,5 @@
 console.log("🔥 APP.JS LOADED");
 
-// =====================
-// MAP SETUP
-// =====================
-
 const map = L.map("map").setView([20, 0], 2);
 
 L.tileLayer(
@@ -14,10 +10,32 @@ L.tileLayer(
 ).addTo(map);
 
 const allMarkers = [];
+const bounds = [];
 
-// =====================
-// LANGUAGE TITLES
-// =====================
+async function geocode(location) {
+  const cacheKey = `geo:${location.toLowerCase()}`;
+  const cached = localStorage.getItem(cacheKey);
+
+  if (cached) {
+    return JSON.parse(cached);
+  }
+
+  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`;
+
+  const res = await fetch(url);
+  const data = await res.json();
+
+  if (!data.length) return null;
+
+  const coords = {
+    lat: parseFloat(data[0].lat),
+    lng: parseFloat(data[0].lon)
+  };
+
+  localStorage.setItem(cacheKey, JSON.stringify(coords));
+
+  return coords;
+}
 
 const TITLE_BY_LANGUAGE = {
   English: { elder: "Elder", sister: "Sister" },
@@ -25,14 +43,12 @@ const TITLE_BY_LANGUAGE = {
   Italian: { elder: "Anziano", sister: "Sorella" },
   French: { elder: "Aîné", sister: "Sœur" },
   German: { elder: "Ältester", sister: "Schwester" },
-  Portuguese: { elder: "Élder", sister: "Irmã" },
-  Japanese: { elder: "Elder", sister: "Sister" }
+  Portuguese: { elder: "Élder", sister: "Irmã" }
 };
 
 function getTitle(sex, name, language) {
   const cleanLanguage = (language || "English").split(",")[0].trim();
   const lang = TITLE_BY_LANGUAGE[cleanLanguage] || TITLE_BY_LANGUAGE.English;
-
   const prefix = sex === "Female" ? lang.sister : lang.elder;
   return `${prefix} ${name}`;
 }
@@ -41,57 +57,45 @@ function getColor(sex) {
   return sex === "Female" ? "#ec4899" : "#2563eb";
 }
 
-function getFlagEmoji(country) {
-  const flags = {
-    Italy: "🇮🇹",
-    "United States": "🇺🇸",
-    USA: "🇺🇸",
-    Mexico: "🇲🇽",
-    Brazil: "🇧🇷",
-    France: "🇫🇷",
-    Germany: "🇩🇪",
-    Spain: "🇪🇸",
-    Japan: "🇯🇵",
-    Canada: "🇨🇦",
-    England: "🇬🇧",
-    "United Kingdom": "🇬🇧",
-    Argentina: "🇦🇷",
-    Chile: "🇨🇱",
-    Peru: "🇵🇪",
-    Colombia: "🇨🇴",
-    Philippines: "🇵🇭",
-    Australia: "🇦🇺",
-    "New Zealand": "🇳🇿"
+function getCountryCode(country) {
+  const codes = {
+    Italy: "it",
+    "United States": "us",
+    USA: "us",
+    Mexico: "mx",
+    Brazil: "br",
+    France: "fr",
+    Germany: "de",
+    Spain: "es",
+    Japan: "jp",
+    Canada: "ca",
+    England: "gb",
+    "United Kingdom": "gb",
+    Argentina: "ar",
+    Chile: "cl",
+    Peru: "pe",
+    Colombia: "co",
+    Philippines: "ph",
+    Australia: "au",
+    "New Zealand": "nz"
   };
 
-  return flags[country] || "🌍";
+  return codes[country] || null;
+}
+
+function getFlagImage(country) {
+  const code = getCountryCode(country);
+
+  if (!code) {
+    return `<div class="flag-placeholder">🌍</div>`;
+  }
+
+  return `<img class="flag-img" src="https://flagcdn.com/w80/${code}.png" alt="${country} flag">`;
 }
 
 function shouldShowSpouse(relation) {
   return (relation || "").toLowerCase().includes("in-law");
 }
-
-// =====================
-// GEOCODE
-// =====================
-
-async function geocode(location) {
-  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`;
-
-  const res = await fetch(url);
-  const data = await res.json();
-
-  if (!data.length) return null;
-
-  return {
-    lat: parseFloat(data[0].lat),
-    lng: parseFloat(data[0].lon)
-  };
-}
-
-// =====================
-// GOOGLE SHEET
-// =====================
 
 async function loadSheet() {
   const url =
@@ -104,7 +108,7 @@ async function loadSheet() {
   const cols = json.table.cols.map(c => c.label);
 
   return json.table.rows.map(row => {
-    let obj = {};
+    const obj = {};
 
     row.c.forEach((cell, i) => {
       obj[cols[i]] = cell ? cell.v : "";
@@ -114,15 +118,59 @@ async function loadSheet() {
   });
 }
 
-// =====================
-// BUILD MAP
-// =====================
+function showInfoCard(m) {
+  const country = m["Mission Country"];
+  const city = m["Mission City"];
+  const sex = m["Biological Sex"];
+  const name = m["Missionary Name (First Last) (e.g., Dawn Hollingsworth)"];
+  const language = m["Assigned Language(s)"];
+  const title = getTitle(sex, name, language);
+
+  const spouse = m["Your Spouse's Name (If Applicable)"];
+  const relation = m["Who is your Haag relation?"];
+
+  const spouseLine =
+    shouldShowSpouse(relation) && spouse
+      ? `<div class="card-spouse">Spouse: ${spouse}</div>`
+      : "";
+
+  document.getElementById("infoCardContent").innerHTML = `
+    <h2>${title}</h2>
+
+    <div class="card-divider"></div>
+
+    <div class="card-location">
+      ${getFlagImage(country)}
+      <div>
+        <div class="card-country">${country}</div>
+        <div class="card-city">${city}</div>
+      </div>
+    </div>
+
+    <div class="card-divider"></div>
+
+    <div class="card-dates">
+      ${m["Start Date (MM/YYYY)"] || ""} – ${m["End Date (MM/YYYY)"] || ""}
+    </div>
+
+    ${spouseLine}
+  `;
+
+  document.getElementById("infoCard").classList.remove("hidden");
+}
+
+function updateStats(data) {
+  document.getElementById("totalMissionaries").textContent = data.length;
+
+  const countries = new Set(
+    data.map(m => m["Mission Country"]).filter(Boolean)
+  );
+
+  document.getElementById("countriesServed").textContent = countries.size;
+}
 
 async function buildMap() {
   const data = await loadSheet();
-
-  console.log("RAW DATA LENGTH:", data.length);
-  console.log("FIRST ROW:", data[0]);
 
   updateStats(data);
 
@@ -135,86 +183,37 @@ async function buildMap() {
     const location = `${city}, ${country}`;
     const coords = await geocode(location);
 
-    if (!coords) {
-      console.log("GEOCODE FAILED:", location);
-      continue;
-    }
+    if (!coords) continue;
 
     const sex = m["Biological Sex"];
-    const name = m["Missionary Name (First Last) (e.g., Dawn Hollingsworth)"];
-    const language = m["Assigned Language(s)"];
-
-    const title = getTitle(sex, name, language);
     const color = getColor(sex);
-    const flag = getFlagEmoji(country);
-
-    const spouse = m["Your Spouse's Name (If Applicable)"];
-    const relation = m["Who is your Haag relation?"];
-
-    const spouseLine =
-      shouldShowSpouse(relation) && spouse
-        ? `<div class="popup-spouse">Spouse: ${spouse}</div>`
-        : "";
 
     const marker = L.circleMarker([coords.lat, coords.lng], {
-      radius: 6,
+      radius: 7,
       color,
       fillColor: color,
-      fillOpacity: 0.85,
+      fillOpacity: 0.9,
       weight: 2
     }).addTo(map);
 
-    marker.bindPopup(`
-      <div class="mission-popup">
-
-        <h2>${title}</h2>
-
-        <div class="popup-divider"></div>
-
-        <div class="popup-location">
-          <span class="popup-flag">${flag}</span>
-          <div>
-            <div class="popup-country">${country}</div>
-            <div class="popup-city">${city}</div>
-          </div>
-        </div>
-
-        <div class="popup-divider"></div>
-
-        <div class="popup-dates">
-          ${m["Start Date (MM/YYYY)"] || ""} – ${m["End Date (MM/YYYY)"] || ""}
-        </div>
-
-        ${spouseLine}
-
-      </div>
-    `);
+    marker.on("click", () => {
+      showInfoCard(m);
+      map.panTo([coords.lat, coords.lng]);
+    });
 
     allMarkers.push({ marker, sex });
+    bounds.push([coords.lat, coords.lng]);
 
     await new Promise(r => setTimeout(r, 300));
   }
+
+  if (bounds.length > 0) {
+    map.fitBounds(bounds, {
+      padding: [60, 60],
+      maxZoom: 5
+    });
+  }
 }
-
-// =====================
-// STATS
-// =====================
-
-function updateStats(data) {
-  document.getElementById("totalMissionaries").textContent = data.length;
-
-  const countries = new Set(
-    data
-      .map(m => m["Mission Country"])
-      .filter(Boolean)
-  );
-
-  document.getElementById("countriesServed").textContent = countries.size;
-}
-
-// =====================
-// FILTERS
-// =====================
 
 function applyFilters() {
   const showElders = document.getElementById("showElders").checked;
@@ -235,8 +234,8 @@ function applyFilters() {
 document.getElementById("showElders").addEventListener("change", applyFilters);
 document.getElementById("showSisters").addEventListener("change", applyFilters);
 
-// =====================
-// START
-// =====================
+document.getElementById("closeCard").addEventListener("click", () => {
+  document.getElementById("infoCard").classList.add("hidden");
+});
 
 buildMap();
