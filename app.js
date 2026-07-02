@@ -135,4 +135,6 @@ async function buildMap() {
 // START
 // =====================
 
+console.log("FIRST ROW KEYS:", Object.keys(data[0]));
+
 buildMap();
