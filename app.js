@@ -83,16 +83,40 @@ function getCountryCode(country) {
   return codes[country] || null;
 }
 
-function getFlagImage(country) {
-  const code = getCountryCode(country);
+function getFlagImage(country, state) {
+  const usNames = ["United States", "USA", "US", "U.S.", "U.S.A."];
 
-  if (!code) {
-    return `<div class="flag-placeholder">🌍</div>`;
+  if (usNames.includes(country) && state) {
+    const stateCode = state.toLowerCase().replace(/\s+/g, "-");
+    return `<img class="flag-img" src="https://cdn.jsdelivr.net/gh/hampusborgos/country-flags@main/svg/us/${stateCode}.svg" alt="${state} flag">`;
   }
+
+  const codes = {
+    Italy: "it",
+    Mexico: "mx",
+    Brazil: "br",
+    France: "fr",
+    Germany: "de",
+    Spain: "es",
+    Japan: "jp",
+    Canada: "ca",
+    Argentina: "ar",
+    Chile: "cl",
+    Peru: "pe",
+    Colombia: "co",
+    Philippines: "ph",
+    Australia: "au",
+    "New Zealand": "nz",
+    England: "gb",
+    "United Kingdom": "gb"
+  };
+
+  const code = codes[country];
+
+  if (!code) return `<div class="flag-placeholder">🌍</div>`;
 
   return `<img class="flag-img" src="https://flagcdn.com/w80/${code}.png" alt="${country} flag">`;
 }
-
 function shouldShowSpouse(relation) {
   return (relation || "").toLowerCase().includes("in-law");
 }
@@ -131,7 +155,6 @@ function formatMissionLocation(country, state, city) {
 function showInfoCard(m) {
   const country = m["Mission Country"];
   const state = m["Mission State"];
-  const city = m["Mission City"];
   const mission = m["Official Mission name (Ex: Maryland Baltimore)"];
 
   const sex = m["Biological Sex"];
@@ -152,13 +175,9 @@ function showInfoCard(m) {
 
     <div class="card-divider"></div>
 
-    <div class="card-mission">${mission || ""}</div>
-
     <div class="card-location-small">
-      ${getFlagImage(country)}
-      <div class="card-place">
-        ${formatMissionLocation(country, state, city)}
-      </div>
+      ${getFlagImage(country, state)}
+      <div class="card-mission">${mission || ""}</div>
     </div>
 
     <div class="card-dates">
