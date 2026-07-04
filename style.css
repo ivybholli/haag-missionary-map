@@ -1,728 +1,690 @@
 /*====================================================
-    HAAG MISSIONARY MAP
-    Version 2
+  HAAG MISSIONARY MAP — VERSION 3
 ====================================================*/
 
-*{
-    box-sizing:border-box;
+* {
+  box-sizing: border-box;
 }
 
 html,
-body{
-
-    margin:0;
-    padding:0;
-
-    width:100%;
-    height:100%;
-
-    overflow:hidden;
-
-    font-family:Georgia,"Times New Roman",serif;
-
-    background:#ece7df;
-
-    color:#40352d;
-
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: Georgia, "Times New Roman", serif;
+  background: #ece7df;
+  color: #40352d;
 }
 
-#map{
-
-    width:100%;
-    height:100vh;
-
+#map {
+  width: 100%;
+  height: 100vh;
 }
 
 /*====================================================
-    SIDEBARS
+  FLOATING PANELS
 ====================================================*/
 
-.map-panel{
-
-    position:absolute;
-
-    background:rgba(255,255,255,.97);
-
-    border:1px solid #d5cec3;
-
-    border-radius:6px;
-
-    box-shadow:
-        0 10px 24px rgba(0,0,0,.16);
-
-    z-index:1000;
-
+.map-panel {
+  position: absolute;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.97);
+  border: 1px solid #d5cec3;
+  border-radius: 6px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
 }
 
-.left-panel{
-
-    left:18px;
-
-    bottom:18px;
-
-    width:320px;
-
-    padding:22px;
-
+.left-panel {
+  left: 18px;
+  bottom: 18px;
+  width: 320px;
+  padding: 22px;
+  max-height: calc(100vh - 36px);
+  overflow-y: auto;
 }
 
-.right-panel{
-
-    right:18px;
-
-    top:18px;
-
-    width:255px;
-
-    padding:18px;
-
+.right-panel {
+  right: 18px;
+  top: 18px;
+  width: 270px;
+  padding: 18px;
+  max-height: calc(100vh - 36px);
+  overflow-y: auto;
 }
 
 /*====================================================
-    HEADINGS
+  HEADINGS
 ====================================================*/
 
-h1{
-
-    margin:0 0 18px;
-
-    font-size:28px;
-
-    font-weight:400;
-
-    color:#4a4036;
-
+h1 {
+  margin: 0 0 18px;
+  font-size: 28px;
+  font-weight: 400;
+  color: #4a4036;
 }
 
-h3{
-
-    margin:0;
-
-    margin-bottom:12px;
-
-    padding-bottom:10px;
-
-    font-size:18px;
-
-    font-weight:400;
-
-    border-bottom:1px solid #e4ddd2;
-
+h3 {
+  margin: 0 0 12px;
+  padding-bottom: 10px;
+  font-size: 18px;
+  font-weight: 400;
+  border-bottom: 1px solid #e4ddd2;
 }
 
-.panel-section{
-
-    margin-top:24px;
-
+.panel-section {
+  margin-top: 24px;
 }
 
 /*====================================================
-    DROPDOWN
+  INPUTS
 ====================================================*/
 
-select{
-
-    width:100%;
-
-    padding:11px;
-
-    font-family:inherit;
-
-    font-size:15px;
-
-    border:1px solid #d3cbc0;
-
-    background:white;
-
-    cursor:pointer;
-
+select,
+#searchInput {
+  width: 100%;
+  padding: 11px;
+  font-family: inherit;
+  font-size: 15px;
+  border: 1px solid #d3cbc0;
+  border-radius: 4px;
+  background: white;
+  color: #40352d;
 }
 
+#searchInput::placeholder {
+  color: #9a9186;
+}
 /*====================================================
-    LEGEND
+  LEGEND
 ====================================================*/
 
-.legend-check{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:10px;
-
-    margin:12px 0;
-
-    cursor:pointer;
-
+.legend-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0;
+  cursor: pointer;
+  user-select: none;
 }
 
-.legend-dot{
-
-    width:15px;
-
-    height:15px;
-
-    border-radius:50%;
-
-    border:2px solid white;
-
-    box-shadow:0 0 0 1px rgba(0,0,0,.15);
-
+.legend-check input {
+  margin: 0;
 }
 
-.elder-dot{
-
-    background:#2563eb;
-
+.legend-dot {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.18);
 }
 
-.sister-dot{
-
-    background:#ec4899;
-
+.elder-dot {
+  background: #2563eb;
 }
 
-.mixed-dot{
-
-    background:#7c3aed;
-
+.sister-dot {
+  background: #ec4899;
 }
 
-.legend-row{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:10px;
-
-    margin-top:10px;
-
+.mixed-dot {
+  background: #7c3aed;
 }
 
-.legend-symbol{
+.legend-symbol {
+  width: 18px;
+  text-align: center;
+  font-size: 17px;
+  font-weight: bold;
+}
 
-    width:20px;
-
-    text-align:center;
-
-    font-size:18px;
-
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
 }
 
 /*====================================================
-    STATISTICS
+  STATISTICS
 ====================================================*/
 
-.stat{
+.stat,
+.stat-highlight {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-    display:flex;
+  padding: 9px 0;
 
-    justify-content:space-between;
-
-    align-items:center;
-
-    padding:8px 0;
-
-    border-bottom:1px solid #ece5da;
-
-    font-size:15px;
-
+  border-bottom: 1px solid #ece6dc;
 }
 
-.stat strong{
+.stat:last-child {
+  border-bottom: none;
+}
 
-    color:#2c3c5d;
+.stat span,
+.stat-highlight span {
+  color: #5b5148;
+  font-size: 15px;
+}
 
-    font-size:18px;
+.stat strong {
+  font-size: 18px;
+  color: #1d3557;
+}
 
+.stat-highlight {
+  flex-direction: column;
+  align-items: flex-start;
+
+  margin-top: 14px;
+
+  padding-top: 14px;
+
+  border-top: 2px solid #ece6dc;
+}
+
+.stat-highlight strong {
+  margin-top: 4px;
+
+  color: #6f4e37;
+
+  font-size: 16px;
+
+  font-weight: 600;
 }
 
 /*====================================================
-    CHECKBOXES
+  TIMELINE
 ====================================================*/
 
-input[type="checkbox"]{
+.timeline-panel {
 
-    transform:scale(1.15);
+  position: absolute;
 
-    cursor:pointer;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  bottom: 18px;
+
+  width: 420px;
+
+  padding: 14px 18px;
+
+  background: rgba(255,255,255,.96);
+
+  border: 1px solid #d5cec3;
+
+  border-radius: 6px;
+
+  box-shadow: 0 10px 24px rgba(0,0,0,.16);
+
+  z-index: 1000;
+
+}
+
+.timeline-header {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  margin-bottom: 10px;
+
+}
+
+.timeline-header span {
+
+  font-size: 16px;
+
+}
+
+.timeline-header strong {
+
+  color: #6f4e37;
+
+}
+
+#timelineSlider {
+
+  width: 100%;
+
+  cursor: pointer;
+
+}
+
+.timeline-actions {
+
+  display: flex;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  margin-top: 10px;
+
+}
+
+.timeline-actions button {
+
+  padding: 7px 14px;
+
+  font-family: inherit;
+
+  border: 1px solid #d5cec3;
+
+  background: white;
+
+  border-radius: 4px;
+
+  cursor: pointer;
+
+  transition: .18s;
+
+}
+
+.timeline-actions button:hover {
+
+  background: #f5f1ea;
 
 }
 /*====================================================
-    CUSTOM MARKERS — OPTION B
+  CUSTOM MARKERS — OPTION B
 ====================================================*/
 
 .custom-marker {
-    background: transparent;
-    border: none;
+  background: transparent;
+  border: none;
 }
 
 .mission-marker {
-    width: 28px;
-    height: 28px;
+  width: 28px;
+  height: 28px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    background: var(--marker-color);
+  background: var(--marker-color);
 
-    border: 3px solid white;
-    border-radius: 50%;
+  border: 3px solid white;
+  border-radius: 50%;
 
-    box-shadow:
-        0 2px 6px rgba(0,0,0,.35);
+  box-shadow: 0 2px 6px rgba(0,0,0,.35);
 
-    color: white;
+  color: white;
 
-    font-family: Arial, sans-serif;
-    font-weight: bold;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
 
-    transition:
-        transform .15s ease,
-        box-shadow .15s ease;
+  transition: transform .15s ease, box-shadow .15s ease;
 }
 
 .mission-marker:hover {
-    transform: scale(1.15);
-
-    box-shadow:
-        0 4px 10px rgba(0,0,0,.4);
+  transform: scale(1.15);
+  box-shadow: 0 4px 10px rgba(0,0,0,.4);
 }
 
 .marker-check {
-    font-size: 16px;
-    line-height: 1;
+  font-size: 16px;
+  line-height: 1;
 }
 
 .marker-number {
-    font-size: 13px;
-    line-height: 1;
+  font-size: 13px;
+  line-height: 1;
 }
 
 .heart-marker {
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
-    border: none;
-    color: var(--marker-color);
-    font-size: 30px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: var(--marker-color);
+  font-size: 30px;
 }
 
 .heart-marker::before {
-    content: "♥";
-    color: var(--marker-color);
-    text-shadow:
-        0 1px 4px rgba(0,0,0,.35);
+  content: "♥";
+  color: var(--marker-color);
+  text-shadow: 0 1px 4px rgba(0,0,0,.35);
 }
 
 /*====================================================
-    LEAFLET POPUPS
+  LEAFLET POPUPS
 ====================================================*/
 
 .haag-leaflet-popup .leaflet-popup-content-wrapper {
-    border-radius: 6px;
-    border: 1px solid #d5cec3;
-
-    box-shadow:
-        0 10px 26px rgba(0,0,0,.24);
-
-    background: rgba(255,255,255,.98);
+  border-radius: 6px;
+  border: 1px solid #d5cec3;
+  background: rgba(255,255,255,.98);
+  box-shadow: 0 10px 26px rgba(0,0,0,.24);
 }
 
 .haag-leaflet-popup .leaflet-popup-content {
-    margin: 0;
-    width: 330px !important;
+  margin: 0;
+  width: 330px !important;
 }
 
 .haag-leaflet-popup .leaflet-popup-tip {
-    background: white;
-    border: 1px solid #d5cec3;
+  background: white;
+  border: 1px solid #d5cec3;
 }
 
 .leaflet-mission-popup {
-    padding: 18px 18px 16px;
-    color: #40352d;
-    font-family: Georgia, "Times New Roman", serif;
-    text-align: center;
+  padding: 18px 18px 16px;
+  color: #40352d;
+  font-family: Georgia, "Times New Roman", serif;
+  text-align: center;
 }
 
 .leaflet-mission-popup h2 {
-    margin: 4px 20px 14px;
-
-    font-size: 23px;
-    font-weight: 400;
-    line-height: 1.15;
-
-    color: #6f4e37;
+  margin: 4px 20px 14px;
+  font-size: 23px;
+  font-weight: 400;
+  line-height: 1.15;
+  color: #6f4e37;
 }
 
 .card-divider {
-    height: 1px;
-    background: #e2dbd1;
-    margin: 13px 0;
+  height: 1px;
+  background: #e2dbd1;
+  margin: 13px 0;
 }
 
 .card-location-small {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    gap: 12px;
-    margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .flag-img {
-    width: 48px;
-    max-height: 34px;
-
-    object-fit: cover;
-
-    border: 1px solid #ddd;
-    border-radius: 3px;
-
-    box-shadow:
-        0 1px 4px rgba(0,0,0,.18);
+  width: 48px;
+  max-height: 34px;
+  object-fit: cover;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.18);
 }
 
 .flag-placeholder {
-    font-size: 34px;
+  font-size: 34px;
 }
 
 .card-mission {
-    font-size: 17px;
-    font-weight: 600;
-    line-height: 1.25;
-    text-align: left;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: left;
 }
 
 .popup-language {
-    margin-top: 4px;
-
-    font-size: 14px;
-    color: #7a6b5c;
-    font-style: italic;
-
-    text-align: left;
+  margin-top: 4px;
+  font-size: 14px;
+  color: #7a6b5c;
+  font-style: italic;
+  text-align: left;
 }
 
 .card-dates {
-    margin-top: 10px;
-    text-align: center;
-    font-size: 15px;
+  margin-top: 10px;
+  text-align: center;
+  font-size: 15px;
 }
 
 .card-date-main {
-    font-size: 15px;
-    color: #40352d;
+  font-size: 15px;
+  color: #40352d;
 }
 
 .currently-serving {
-    display: inline-block;
-
-    margin-top: 8px;
-    padding: 4px 9px;
-
-    border-radius: 999px;
-
-    background: #eef4ff;
-    color: #1d4ed8;
-
-    font-size: 13px;
-    font-weight: 600;
+  display: inline-block;
+  margin-top: 8px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #eef4ff;
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .mission-length {
-    margin-top: 6px;
-
-    color: #7a6b5c;
-
-    font-size: 13px;
-    font-style: italic;
+  margin-top: 6px;
+  color: #7a6b5c;
+  font-size: 13px;
+  font-style: italic;
 }
 
 .card-presidents {
-    margin-top: 12px;
-
-    text-align: center;
-
-    font-size: 14px;
-    line-height: 1.45;
-
-    color: #555;
+  margin-top: 12px;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.45;
+  color: #555;
 }
 
 .card-spouse {
-    margin-top: 12px;
+  margin-top: 12px;
+  text-align: center;
+  font-size: 15px;
+  font-style: italic;
+  color: #666;
+}
+/*====================================================
+  CLICKABLE MISSIONARY LIST
+====================================================*/
 
-    text-align: center;
+.missionary-list {
+  margin-top: 14px;
+}
 
+.missionary-list-item {
+  width: 100%;
+  display: block;
+
+  background: white;
+
+  border: 1px solid #e8e2d8;
+  border-radius: 6px;
+
+  padding: 10px 12px;
+  margin-bottom: 8px;
+
+  cursor: pointer;
+
+  transition:
+    background .18s ease,
+    transform .15s ease,
+    box-shadow .18s ease;
+
+  text-align: center;
+
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.missionary-list-item:hover {
+  background: #f8f5ef;
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 4px 10px rgba(0,0,0,.08);
+}
+
+.missionary-list-item strong {
+  display: block;
+  font-size: 15px;
+  color: #4a4036;
+  margin-bottom: 4px;
+}
+
+.missionary-list-item span {
+  color: #7b7368;
+  font-size: 13px;
+}
+
+/*====================================================
+  LEAFLET CONTROLS
+====================================================*/
+
+.leaflet-control-zoom {
+  border-radius: 6px !important;
+  overflow: hidden;
+
+  box-shadow:
+    0 3px 10px rgba(0,0,0,.18);
+}
+
+.leaflet-bar {
+  border: 1px solid #d5cec3 !important;
+}
+
+.leaflet-control-zoom a {
+  color: #555;
+}
+
+.leaflet-container {
+  background: #ddd7ca;
+}
+
+/*====================================================
+  MOBILE RESPONSIVE
+====================================================*/
+
+@media (max-width: 900px) {
+
+  .left-panel {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+
+    width: auto;
+    max-height: 38vh;
+    overflow-y: auto;
+    padding: 16px;
+  }
+
+  .right-panel {
+    right: 10px;
+    top: 10px;
+
+    width: 185px;
+    padding: 14px;
+  }
+
+  .timeline-panel {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+
+    width: auto;
+
+    transform: none;
+  }
+
+  h1 {
+    font-size: 22px;
+  }
+
+  h3 {
+    font-size: 16px;
+  }
+
+  .stat {
+    font-size: 13px;
+  }
+
+  .stat strong {
     font-size: 15px;
-    font-style: italic;
+  }
 
-    color: #666;
-}
-/*====================================================
-    CLICKABLE MISSIONARY LIST
-====================================================*/
-
-.missionary-list{
-    margin-top:14px;
-}
-
-.missionary-list-item{
-
-    width:100%;
-
-    display:block;
-
-    background:white;
-
-    border:1px solid #e8e2d8;
-
-    border-radius:6px;
-
-    padding:10px 12px;
-
-    margin-bottom:8px;
-
-    cursor:pointer;
-
-    transition:
-        background .18s ease,
-        transform .15s ease,
-        box-shadow .18s ease;
-
-    text-align:center;
-
-    font-family:Georgia,"Times New Roman",serif;
+  .haag-leaflet-popup .leaflet-popup-content {
+    width: 270px !important;
+  }
 
 }
 
-.missionary-list-item:hover{
+@media (max-width: 600px) {
 
-    background:#f8f5ef;
+  .left-panel {
+    max-height: 34vh;
+  }
 
-    transform:translateY(-2px);
+  .right-panel {
+    width: 165px;
+  }
 
-    box-shadow:
-        0 4px 10px rgba(0,0,0,.08);
+  .timeline-panel {
+    padding: 10px;
+  }
 
-}
-
-.missionary-list-item strong{
-
-    display:block;
-
-    font-size:15px;
-
-    color:#4a4036;
-
-    margin-bottom:4px;
-
-}
-
-.missionary-list-item span{
-
-    color:#7b7368;
-
-    font-size:13px;
+  .leaflet-control-zoom {
+    transform: scale(.92);
+    transform-origin: top left;
+  }
 
 }
 
 /*====================================================
-    LEAFLET CONTROLS
+  ANIMATIONS
 ====================================================*/
 
-.leaflet-control-zoom{
+.mission-marker {
+  animation: markerFade .25s ease;
+}
 
-    border-radius:6px !important;
+@keyframes markerFade {
 
-    overflow:hidden;
+  from {
+    opacity: 0;
+    transform: scale(.6);
+  }
 
-    box-shadow:
-        0 3px 10px rgba(0,0,0,.18);
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 
 }
 
-.leaflet-bar{
-
-    border:1px solid #d5cec3 !important;
-
+.leaflet-popup {
+  animation: popupFade .18s ease;
 }
 
-.leaflet-control-zoom a{
+@keyframes popupFade {
 
-    color:#555;
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
 
-}
-
-.leaflet-container{
-
-    background:#ddd7ca;
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 
 }
 
 /*====================================================
-    SCROLLBARS
+  SCROLLBAR
 ====================================================*/
 
-::-webkit-scrollbar{
-
-    width:8px;
-
+::-webkit-scrollbar {
+  width: 8px;
 }
 
-::-webkit-scrollbar-thumb{
-
-    background:#d7d0c6;
-
-    border-radius:20px;
-
+::-webkit-scrollbar-thumb {
+  background: #d8d0c5;
+  border-radius: 20px;
 }
 
-/*====================================================
-    MOBILE
-====================================================*/
-
-@media (max-width:900px){
-
-    .left-panel{
-
-        left:10px;
-        right:10px;
-        bottom:10px;
-
-        width:auto;
-
-        max-height:40vh;
-
-        overflow-y:auto;
-
-        padding:16px;
-
-    }
-
-    .right-panel{
-
-        right:10px;
-        top:10px;
-
-        width:185px;
-
-        padding:14px;
-
-    }
-
-    h1{
-
-        font-size:22px;
-
-    }
-
-    h3{
-
-        font-size:16px;
-
-    }
-
-    .stat{
-
-        font-size:13px;
-
-    }
-
-    .stat strong{
-
-        font-size:15px;
-
-    }
-
-    .haag-leaflet-popup .leaflet-popup-content{
-
-        width:270px !important;
-
-    }
-
-}
-
-@media (max-width:600px){
-
-    .left-panel{
-
-        max-height:34vh;
-
-    }
-
-    .right-panel{
-
-        width:165px;
-
-    }
-
-    .leaflet-control-zoom{
-
-        transform:scale(.92);
-
-        transform-origin:top left;
-
-    }
-
-}
-
-/*====================================================
-    FADE ANIMATION
-====================================================*/
-
-.mission-marker{
-
-    animation:fadeMarker .25s ease;
-
-}
-
-@keyframes fadeMarker{
-
-    from{
-
-        opacity:0;
-
-        transform:scale(.65);
-
-    }
-
-    to{
-
-        opacity:1;
-
-        transform:scale(1);
-
-    }
-
-}
-
-.leaflet-popup{
-
-    animation:fadePopup .18s ease;
-
-}
-
-@keyframes fadePopup{
-
-    from{
-
-        opacity:0;
-
-        transform:translateY(8px);
-
-    }
-
-    to{
-
-        opacity:1;
-
-        transform:translateY(0);
-
-    }
-
+::-webkit-scrollbar-track {
+  background: transparent;
 }
