@@ -30,30 +30,6 @@ const TITLE_BY_LANGUAGE = {
   Danish: { elder: "Ældste", sister: "Søster" }
 };
 
-const COUNTRY_CODES = {
-  "United States": "us",
-  USA: "us",
-  US: "us",
-  Brazil: "br",
-  Denmark: "dk",
-  Germany: "de",
-  Italy: "it",
-  France: "fr",
-  Spain: "es",
-  Mexico: "mx",
-  Canada: "ca",
-  England: "gb",
-  "United Kingdom": "gb",
-  Argentina: "ar",
-  Chile: "cl",
-  Peru: "pe",
-  Colombia: "co",
-  Philippines: "ph",
-  Japan: "jp",
-  Australia: "au",
-  "New Zealand": "nz"
-};
-
 const CONTINENTS = {
   "United States": "North America",
   USA: "North America",
@@ -115,8 +91,6 @@ async function loadSheet(sheetName) {
   const json = JSON.parse(text.substring(47).slice(0, -2));
   const cols = json.table.cols.map(c => cleanHeader(c.label));
 
-  console.log(`Columns for ${sheetName}:`, cols);
-
   return json.table.rows.map(row => {
     const obj = {};
 
@@ -159,10 +133,6 @@ function getMissionName(m) {
     "Official Mission name",
     "Mission Name"
   ]);
-}
-
-function getCity(m) {
-  return getValue(m, ["City", "Mission City"]);
 }
 
 function getState(m) {
@@ -220,9 +190,7 @@ function getColor(sex) {
 function parseMissionEndDate(value) {
   if (!value) return null;
 
-  const text = String(value).trim();
-  const parts = text.split("/");
-
+  const parts = String(value).trim().split("/");
   if (parts.length !== 2) return null;
 
   const month = Number(parts[0]);
@@ -283,8 +251,8 @@ function createIcon(shape, color, count = null) {
 }
 
 function getFlagImage(country, state) {
-  const cleanCountry = String(country || "").trim();
-  const cleanState = String(state || "").trim();
+  const cleanCountry = String(country || "").replace(/\s+/g, " ").trim();
+  const cleanState = String(state || "").replace(/\s+/g, " ").trim();
 
   const countryCodes = {
     "United States": "us",
@@ -310,24 +278,30 @@ function getFlagImage(country, state) {
     "New Zealand": "nz"
   };
 
-  const regionFlags = {
-    "United States": {
-      Maryland: "https://cdn.jsdelivr.net/gh/hampusborgos/country-flags@main/svg/us/maryland.svg",
-      Louisiana: "https://cdn.jsdelivr.net/gh/hampusborgos/country-flags@main/svg/us/louisiana.svg",
-      Utah: "https://cdn.jsdelivr.net/gh/hampusborgos/country-flags@main/svg/us/utah.svg",
-      Ohio: "https://cdn.jsdelivr.net/gh/hampusborgos/country-flags@main/svg/us/ohio.svg",
-      Washington: "https://cdn.jsdelivr.net/gh/hampusborgos/country-flags@main/svg/us/washington.svg",
-      Oregon: "https://cdn.jsdelivr.net/gh/hampusborgos/country-flags@main/svg/us/oregon.svg",
-      Connecticut: "https://cdn.jsdelivr.net/gh/hampusborgos/country-flags@main/svg/us/connecticut.svg"
-    },
-    Brazil: {
-      Goiás: "https://upload.wikimedia.org/wikipedia/commons/0/0d/Bandeira_de_Goi%C3%A1s.svg",
-      "Rio de Janeiro": "https://upload.wikimedia.org/wikipedia/commons/7/73/Bandeira_do_estado_do_Rio_de_Janeiro.svg"
-    }
+  const usStateFlags = {
+    Maryland: "maryland",
+    Louisiana: "louisiana",
+    Utah: "utah",
+    Ohio: "ohio",
+    Washington: "washington",
+    Oregon: "oregon",
+    Connecticut: "connecticut"
   };
 
-  if (regionFlags[cleanCountry] && regionFlags[cleanCountry][cleanState]) {
-    return `<img class="flag-img" src="${regionFlags[cleanCountry][cleanState]}" alt="${cleanState} flag">`;
+  const brazilStateFlags = {
+    Goiás: "https://upload.wikimedia.org/wikipedia/commons/0/0d/Bandeira_de_Goi%C3%A1s.svg",
+    "Rio de Janeiro": "https://upload.wikimedia.org/wikipedia/commons/7/73/Bandeira_do_estado_do_Rio_de_Janeiro.svg"
+  };
+
+  if (
+    ["United States", "USA", "US"].includes(cleanCountry) &&
+    usStateFlags[cleanState]
+  ) {
+    return `<img class="flag-img" src="https://cdn.jsdelivr.net/gh/hampusborgos/country-flags@main/svg/us/${usStateFlags[cleanState]}.svg" alt="${cleanState} flag">`;
+  }
+
+  if (cleanCountry === "Brazil" && brazilStateFlags[cleanState]) {
+    return `<img class="flag-img" src="${brazilStateFlags[cleanState]}" alt="${cleanState} flag">`;
   }
 
   const code = countryCodes[cleanCountry];
@@ -376,6 +350,7 @@ function showInfoCard(missionaries) {
     const first = list[0];
     const mission = getMissionName(first);
     const country = getCountry(first);
+    const state = getState(first);
 
     document.getElementById("infoCardContent").innerHTML = `
       <h2>${mission}</h2>
@@ -383,7 +358,7 @@ function showInfoCard(missionaries) {
       <div class="card-divider"></div>
 
       <div class="card-location-small">
-        ${getFlagImage(country)}
+        ${getFlagImage(country, state)}
         <div class="card-mission">${list.length} missionaries served here</div>
       </div>
 
@@ -429,9 +404,7 @@ function updateStats(data) {
   document.getElementById("totalSisters").textContent =
     data.filter(m => getSex(m) === "Female").length;
 
-  const countries = new Set(
-    data.map(m => getCountry(m)).filter(Boolean)
-  );
+  const countries = new Set(data.map(m => getCountry(m)).filter(Boolean));
 
   const languages = new Set();
 
@@ -515,8 +488,6 @@ function drawMarkers() {
     bounds.push([coords.lat, coords.lng]);
   });
 
-  console.log("Markers drawn:", bounds.length);
-
   if (bounds.length > 0) {
     map.fitBounds(bounds, {
       padding: [80, 80],
@@ -549,7 +520,6 @@ async function buildMap() {
 
   allMissionaries = missionaries.map(m => {
     const missionName = getMissionName(m);
-
     const coords = coordLookup[normalize(missionName)] || null;
 
     if (!coords) {
