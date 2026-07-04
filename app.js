@@ -481,9 +481,6 @@ async function buildMap() {
   const missionaries = await loadSheet(MISSIONARY_SHEET_NAME);
   const coordinates = await loadSheet(COORDINATES_SHEET_NAME);
 
-  console.log("Missionaries loaded:", missionaries);
-  console.log("Coordinates loaded:", coordinates);
-
   const coordLookup = {};
 
   coordinates.forEach(row => {
@@ -502,14 +499,13 @@ async function buildMap() {
     coordLookup[normalize(missionName)] = { lat, lng };
   });
 
-  console.log("Coordinate lookup:", coordLookup);
-
   allMissionaries = missionaries.map(m => {
     const missionName = getMissionName(m);
+
     const coords = coordLookup[normalize(missionName)] || null;
 
     if (!coords) {
-      console.warn("No coordinates found for mission:", missionName, m);
+      console.warn("No coordinates found for mission:", missionName);
     }
 
     return {
@@ -517,8 +513,6 @@ async function buildMap() {
       coords
     };
   });
-
-  console.log("Missionaries with coordinates:", allMissionaries);
 
   drawMarkers();
 }
