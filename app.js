@@ -291,6 +291,14 @@ function getFlagImage(country, state) {
 
   return `<img class="flag-img" src="https://flagcdn.com/w80/${code}.png" alt="${cleanCountry} flag">`;
 }
+
+function formatPresidents(presidents) {
+  return String(presidents || "")
+    .split(";")
+    .map(name => name.trim())
+    .filter(Boolean)
+    .join("<br>");
+}
  
 function showInfoCard(missionaries) {
   const list = Array.isArray(missionaries) ? missionaries : [missionaries];
@@ -321,7 +329,7 @@ function showInfoCard(missionaries) {
 
       <div class="card-dates">${start || ""} – ${end || ""}</div>
 
-      ${presidents ? `<div class="card-presidents">${presidents}</div>` : ""}
+      ${presidents ? `<div class="card-presidents">${formatPresidents(presidents)}</div>` : ""}
 
       ${spouse ? `<div class="card-spouse">Married to ${spouse}</div>` : ""}
     `;
