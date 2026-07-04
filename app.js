@@ -39,10 +39,10 @@ let allMarkers = [];
 const TITLE_BY_LANGUAGE = {
   English: { elder: "Elder", sister: "Sister" },
   Spanish: { elder: "Élder", sister: "Hermana" },
-  Italian: { elder: "Anziano", sister: "Sorella" },
-  French: { elder: "Aîné", sister: "Sœur" },
-  German: { elder: "Ältester", sister: "Schwester" },
-  Portuguese: { elder: "Élder", sister: "Irmã" },
+  Italian: { elder: "Elder", sister: "Sorella" },
+  French: { elder: "Elder", sister: "Sœur" },
+  German: { elder: "Elder", sister: "Schwester" },
+  Portuguese: { elder: "Élder", sister: "Sister" },
   Danish: { elder: "Ældste", sister: "Søster" }
 };
 
