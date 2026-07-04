@@ -254,57 +254,36 @@ function getFlagImage(country, state) {
   const cleanCountry = String(country || "").replace(/\s+/g, " ").trim();
   const cleanState = String(state || "").replace(/\s+/g, " ").trim();
 
-  const countryCodes = {
-    "United States": "us",
-    USA: "us",
-    US: "us",
-    Brazil: "br",
-    Denmark: "dk",
-    Germany: "de",
-    Italy: "it",
-    France: "fr",
-    Spain: "es",
-    Mexico: "mx",
-    Canada: "ca",
-    England: "gb",
-    "United Kingdom": "gb",
-    Argentina: "ar",
-    Chile: "cl",
-    Peru: "pe",
-    Colombia: "co",
-    Philippines: "ph",
-    Japan: "jp",
-    Australia: "au",
-    "New Zealand": "nz"
-  };
+  console.log("FLAG CHECK:", { cleanCountry, cleanState });
 
   const usStateFlags = {
-    Maryland: "maryland",
-    Louisiana: "louisiana",
-    Utah: "utah",
-    Ohio: "ohio",
-    Washington: "washington",
-    Oregon: "oregon",
-    Connecticut: "connecticut"
+    Maryland: "https://upload.wikimedia.org/wikipedia/commons/a/a0/Flag_of_Maryland.svg",
+    Louisiana: "https://upload.wikimedia.org/wikipedia/commons/e/e0/Flag_of_Louisiana.svg",
+    Utah: "https://upload.wikimedia.org/wikipedia/commons/f/f6/Flag_of_Utah.svg",
+    Ohio: "https://upload.wikimedia.org/wikipedia/commons/4/4c/Flag_of_Ohio.svg",
+    Washington: "https://upload.wikimedia.org/wikipedia/commons/5/54/Flag_of_Washington.svg",
+    Oregon: "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Oregon.svg",
+    Connecticut: "https://upload.wikimedia.org/wikipedia/commons/9/96/Flag_of_Connecticut.svg"
   };
 
-  const brazilStateFlags = {
-    Goiás: "https://upload.wikimedia.org/wikipedia/commons/0/0d/Bandeira_de_Goi%C3%A1s.svg",
-    "Rio de Janeiro": "https://upload.wikimedia.org/wikipedia/commons/7/73/Bandeira_do_estado_do_Rio_de_Janeiro.svg"
+  const countryCodes = {
+    "united states": "us",
+    "usa": "us",
+    "us": "us",
+    "brazil": "br",
+    "denmark": "dk",
+    "germany": "de",
+    "italy": "it"
   };
 
   if (
     ["United States", "USA", "US"].includes(cleanCountry) &&
     usStateFlags[cleanState]
   ) {
-    return `<img class="flag-img" src="https://cdn.jsdelivr.net/gh/hampusborgos/country-flags@main/svg/us/${usStateFlags[cleanState]}.svg" alt="${cleanState} flag">`;
+    return `<img class="flag-img" src="${usStateFlags[cleanState]}" alt="${cleanState} flag">`;
   }
 
-  if (cleanCountry === "Brazil" && brazilStateFlags[cleanState]) {
-    return `<img class="flag-img" src="${brazilStateFlags[cleanState]}" alt="${cleanState} flag">`;
-  }
-
-  const code = countryCodes[cleanCountry];
+  const code = countryCodes[cleanCountry.toLowerCase()];
 
   if (!code) {
     return `<div class="flag-placeholder">🌍</div>`;
@@ -312,7 +291,7 @@ function getFlagImage(country, state) {
 
   return `<img class="flag-img" src="https://flagcdn.com/w80/${code}.png" alt="${cleanCountry} flag">`;
 }
-
+ 
 function showInfoCard(missionaries) {
   const list = Array.isArray(missionaries) ? missionaries : [missionaries];
 
