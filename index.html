@@ -45,6 +45,19 @@
     </div>
 
     <div class="panel-section">
+  <h3>Years Served</h3>
+
+  <details class="year-dropdown">
+    <summary>Select Years</summary>
+    <div id="yearCheckboxes" class="year-checkboxes"></div>
+  </details>
+
+  <button id="clearYears" type="button" class="clear-years-btn">
+    Clear Years
+  </button>
+</div>
+    
+    <div class="panel-section">
       <h3>Legend</h3>
 
       <label class="legend-check">
@@ -104,12 +117,6 @@
       <strong id="topMission">--</strong>
     </div>
   </aside>
-
-  <div class="timeline-panel">
-    <div class="timeline-header">
-      <span>Timeline</span>
-      <strong id="timelineYearLabel">All Years</strong>
-    </div>
 
     <input type="range" id="timelineSlider" min="1900" max="2035" value="2035" />
 
