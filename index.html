@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Haag Missionary Map</title>
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
@@ -17,6 +18,7 @@
 
     <div class="panel-section">
       <h3>Haag Siblings</h3>
+
       <select id="familyFilter">
         <option value="all">Whole Haag Family</option>
         <option value="Darrell">Darrell</option>
@@ -37,26 +39,71 @@
     <div class="panel-section">
       <h3>Legend</h3>
 
-      <label><input type="checkbox" id="showElders" checked /> <span class="dot blue"></span> Elders</label>
-      <label><input type="checkbox" id="showSisters" checked /> <span class="dot pink"></span> Sisters</label>
+      <label class="legend-check">
+        <input type="checkbox" id="showElders" checked />
+        <span class="legend-dot elder-dot"></span>
+        Elders
+      </label>
 
-      <div class="legend-row">★ Currently Serving</div>
-      <div class="legend-row">♥ Married In / In-law</div>
+      <label class="legend-check">
+        <input type="checkbox" id="showSisters" checked />
+        <span class="legend-dot sister-dot"></span>
+        Sisters
+      </label>
+
+      <div class="legend-row">
+        <span class="legend-symbol">★</span>
+        Currently Serving
+      </div>
+
+      <div class="legend-row">
+        <span class="legend-symbol">♥</span>
+        Married In / In-law
+      </div>
+
+      <div class="legend-row">
+        <span class="legend-dot mixed-dot"></span>
+        Elders & Sisters
+      </div>
     </div>
   </aside>
 
   <aside class="map-panel right-panel">
     <h3>Statistics</h3>
-    <div class="stat"><span>Total Missionaries</span><strong id="totalMissionaries">--</strong></div>
-    <div class="stat"><span>Total Elders</span><strong id="totalElders">--</strong></div>
-    <div class="stat"><span>Total Sisters</span><strong id="totalSisters">--</strong></div>
-    <div class="stat"><span>Countries</span><strong id="countriesServed">--</strong></div>
-    <div class="stat"><span>Languages</span><strong id="totalLanguages">--</strong></div>
-    <div class="stat"><span>Continents</span><strong id="totalContinents">--</strong></div>
+
+    <div class="stat">
+      <span>Total Missionaries</span>
+      <strong id="totalMissionaries">--</strong>
+    </div>
+
+    <div class="stat">
+      <span>Total Elders</span>
+      <strong id="totalElders">--</strong>
+    </div>
+
+    <div class="stat">
+      <span>Total Sisters</span>
+      <strong id="totalSisters">--</strong>
+    </div>
+
+    <div class="stat">
+      <span>Countries</span>
+      <strong id="countriesServed">--</strong>
+    </div>
+
+    <div class="stat">
+      <span>Languages</span>
+      <strong id="totalLanguages">--</strong>
+    </div>
+
+    <div class="stat">
+      <span>Continents</span>
+      <strong id="totalContinents">--</strong>
+    </div>
   </aside>
 
   <div id="infoCard" class="info-card hidden">
-    <button id="closeCard" class="close-card">×</button>
+    <button id="closeCard" class="close-card" aria-label="Close">×</button>
     <div id="infoCardContent"></div>
   </div>
 
