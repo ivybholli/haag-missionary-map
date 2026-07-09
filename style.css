@@ -1,0 +1,356 @@
+html, body, #map {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+#map {
+  position: fixed;
+  inset: 0;
+}
+
+.map-panel {
+  position: absolute;
+  z-index: 10;
+  top: 16px;
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+  background: rgba(255,255,255,.92);
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(0,0,0,.22);
+  padding: 16px;
+  backdrop-filter: blur(8px);
+}
+
+.left-panel { left: 16px; width: 310px; }
+.right-panel { right: 16px; width: 275px; }
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: start;
+}
+
+.panel-header h1 {
+  font-size: 20px;
+  margin: 0 0 10px;
+}
+
+.panel-header h3, .panel-section h3 {
+  margin: 0 0 8px;
+}
+
+.panel-section {
+  margin: 14px 0;
+}
+
+.panel-section input,
+.panel-section select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 10px;
+  border-radius: 10px;
+  border: 1px solid #d7d7d7;
+}
+
+.panel-close, .collapse-btn, .clear-all-inline-btn {
+  border: 0;
+  border-radius: 999px;
+  background: #ffffff;
+  padding: 8px 11px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,.14);
+}
+
+.collapse-btn {
+  position: absolute;
+  z-index: 12;
+  display: none;
+  top: 14px;
+}
+
+.menu-toggle { left: 14px; }
+.stats-toggle { right: 14px; }
+
+.hidden-panel { display: none; }
+
+.legend-check, .legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 7px 0;
+}
+
+.legend-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.elder-dot { background: #2563eb; }
+.sister-dot { background: #ec4899; }
+.mixed-dot { background: #7c3aed; }
+
+.legend-current-ring {
+  width: 13px;
+  height: 13px;
+  border: 3px solid #facc15;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.legend-symbol { color: #e11d48; font-weight: bold; }
+
+.year-checkboxes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 4px 10px;
+  margin-top: 8px;
+}
+
+.year-option {
+  font-size: 13px;
+}
+
+.stat, .stat-highlight {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #e7e7e7;
+}
+
+.stat-highlight strong {
+  color: #1d4ed8;
+}
+
+.country-stats-box {
+  margin-top: 14px;
+}
+
+.country-stats-title {
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.country-stats-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.country-chip {
+  border: 1px solid #d7d7d7;
+  background: white;
+  border-radius: 999px;
+  padding: 5px 8px;
+  cursor: pointer;
+}
+
+.country-chip.active {
+  background: #dbeafe;
+  border-color: #60a5fa;
+}
+
+.country-stats-detail {
+  margin-top: 10px;
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.custom-marker {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+}
+
+.mission-marker {
+  width: 18px;
+  height: 18px;
+  background: var(--marker-color);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0,0,0,.4);
+  display: grid;
+  place-items: center;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.duplicate-marker {
+  width: 25px;
+  height: 25px;
+}
+
+.current-marker {
+  outline: 3px solid #facc15;
+}
+
+.heart-marker::after {
+  content: "♥";
+  position: absolute;
+  transform: translate(11px,-10px);
+  color: #e11d48;
+  text-shadow: 0 1px 2px white;
+}
+
+.pulse-marker {
+  animation: pulseMarker 1.4s ease;
+}
+
+@keyframes pulseMarker {
+  0%, 100% { transform: scale(1); }
+  40% { transform: scale(1.8); }
+}
+
+.haag-leaflet-popup .maplibregl-popup-content {
+  border-radius: 18px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.leaflet-mission-popup {
+  padding: 16px;
+  min-width: 240px;
+  color: #1f2937;
+}
+
+.leaflet-mission-popup h2 {
+  margin: 0;
+  font-size: 19px;
+}
+
+.card-divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 10px 0;
+}
+
+.card-location-small {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.flag-img {
+  width: 46px;
+  max-height: 32px;
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.22);
+  background: white;
+}
+
+.flag-placeholder {
+  width: 46px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  background: #f3f4f6;
+  border-radius: 4px;
+}
+
+.card-mission {
+  font-weight: 700;
+}
+
+.popup-language, .mission-meta, .mission-length, .card-spouse, .card-presidents {
+  color: #4b5563;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.card-dates {
+  margin-top: 12px;
+}
+
+.card-date-main {
+  font-weight: 700;
+}
+
+.currently-serving {
+  color: #16a34a;
+  font-weight: 700;
+  margin-top: 3px;
+}
+
+.mission-type-pill {
+  display: inline-block;
+  background: #eef2ff;
+  color: #4338ca;
+  border-radius: 999px;
+  padding: 2px 7px;
+}
+
+.meta-separator {
+  margin: 0 6px;
+}
+
+.assignment-links {
+  margin-top: 10px;
+  display: grid;
+  gap: 5px;
+}
+
+.mission-jump-link {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.missionary-list {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.missionary-list-item {
+  text-align: left;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.missionary-list-item span {
+  display: block;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.missionary-list-item.active {
+  background: #dbeafe;
+  border-color: #60a5fa;
+}
+
+.detail-preview {
+  position: fixed;
+  z-index: 50;
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 16px 40px rgba(0,0,0,.25);
+  max-width: 360px;
+}
+
+.detail-preview.hidden {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  .map-panel {
+    top: 58px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-height: calc(100vh - 80px);
+  }
+  .right-panel { left: 12px; right: 12px; width: auto; }
+  .collapse-btn { display: block; }
+}
